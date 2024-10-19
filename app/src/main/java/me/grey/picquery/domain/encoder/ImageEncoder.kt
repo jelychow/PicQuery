@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.grey.picquery.PicQueryApplication
 import me.grey.picquery.common.AssetUtil
+import me.grey.picquery.common.Constants.EMB_INPUT_SIZE
 import me.grey.picquery.common.MemoryFormat
 import me.grey.picquery.common.allocateFloatBuffer
 import me.grey.picquery.common.bitmapToFloatBuffer
@@ -20,13 +21,14 @@ import java.util.Collections
 private val normMeanRGB = floatArrayOf(0.48145467f, 0.4578275f, 0.40821072f)
 private val normStdRGB = floatArrayOf(0.26862955f, 0.2613026f, 0.2757771f)
 
-val IMAGE_INPUT_SIZE = Size(224, 224)
+val IMAGE_INPUT_SIZE = Size(EMB_INPUT_SIZE, EMB_INPUT_SIZE)
 
 class ImageEncoder {
     companion object {
         private const val TAG = "ImageEncoder"
-        private const val modelPath = "clip-image-int8.ort"
-        private const val floatBufferElementCount = 3 * 224 * 224
+//        private const val modelPath = "clip-image-int8.ort"
+        private const val modelPath = "mobileclip-image-uint8.onnx"
+        private const val floatBufferElementCount = 3 * EMB_INPUT_SIZE * EMB_INPUT_SIZE
     }
 
     private var ortSession: OrtSession? = null
@@ -71,7 +73,7 @@ class ImageEncoder {
             bitmapToFloatBuffer(
                 imageBitmap,
                 0, 0,
-                224, 224,
+                EMB_INPUT_SIZE, EMB_INPUT_SIZE,
                 normMeanRGB,
                 normStdRGB,
                 floatBuffer,
@@ -81,7 +83,9 @@ class ImageEncoder {
             floatBuffer.rewind()
 
             val inputName = ortSession?.inputNames?.iterator()?.next()
-            val shape: LongArray = longArrayOf(1, 3, 224, 224)
+            val shape: LongArray = longArrayOf(1, 3, EMB_INPUT_SIZE.toLong(),
+                EMB_INPUT_SIZE.toLong()
+            )
             ortEnv.use { env ->
                 val tensor = OnnxTensor.createTensor(env, floatBuffer, shape)
                 val output: OrtSession.Result? =

@@ -20,4 +20,5 @@ object Constants {
     const val PRIVACY_URL = "https://grey030.gitee.io/pages/picquery/privacy.html"
     const val SOURCE_REPO_URL = "https://github.com/greyovo/PicQuery"
 
+    const val EMB_INPUT_SIZE = 256
 }

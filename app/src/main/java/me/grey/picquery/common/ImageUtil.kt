@@ -10,6 +10,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import me.grey.picquery.common.Constants.EMB_INPUT_SIZE
+import me.grey.picquery.data.dao.EmbeddingDao_Impl
 import me.grey.picquery.data.model.Photo
 import me.grey.picquery.domain.encoder.IMAGE_INPUT_SIZE
 import java.io.File
@@ -72,7 +74,7 @@ suspend fun loadThumbnail(context: Context, photo: Photo, size: Size = IMAGE_INP
                     .load(photo.path)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .downsample(DownsampleStrategy.FIT_CENTER)
-                    .override(224)
+                    .override(EMB_INPUT_SIZE,EMB_INPUT_SIZE)
                     .skipMemoryCache(true)
                     .submit().get()
             } catch (e: ExecutionException) {
@@ -102,5 +104,5 @@ fun saveBitMap(context: Context, bitmap: Bitmap, name: String) {
 
 fun preprocess(bitmap: Bitmap): Bitmap {
     // bitmap size to 224x224
-    return Bitmap.createScaledBitmap(bitmap, 224, 224, true)
+    return Bitmap.createScaledBitmap(bitmap, EMB_INPUT_SIZE, EMB_INPUT_SIZE, true)
 }
